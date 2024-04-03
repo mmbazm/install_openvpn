@@ -8,7 +8,7 @@
 ##############################################################################
 
 # Default target version
-target_version="2.4.12"
+target_version="2.4.7"
 
 # Check if a target version is provided as a command-line argument
 if [ $# -gt 0 ]; then
@@ -17,7 +17,7 @@ fi
 
 # Variables
 # URL for downloading the OpenVPN installer
-openvpn_url="https://swupdate.openvpn.org/community/releases/openvpn-${target_version}.tar.gz"
+#openvpn_url="https://swupdate.openvpn.org/community/releases/openvpn-${target_version}.tar.gz"
 
 
 # Func to check if OpenVPN is installed and its version. If already installed return the version otherwise null value
@@ -32,7 +32,7 @@ get_openvpn_version() {
 
 # local function to log the steps of execution of the script
 function info {
-  echo -e [`date +"%D %T"`] "\t\t"$*
+  echo -e [$(date +"%D %T")] "\t\t"$*
 }
 
 info "Script is running ..."
@@ -64,30 +64,36 @@ fi
 
 # Check if OpenVPN is already installed and its version
 installed_version=$(get_openvpn_version)
-echo "$installed_version"
-if [ -z "$installed_version" ] || [ "$installed_version" != "$target_version" ]; then
+
+if [ "$installed_version" == "null" ] || [ "$installed_version" != "$target_version" ]; then
 
     if [ "${os}" == "ubuntu" ] || [ "${os}" == "debian" ]; then
+
         if [[ $os_version == "16.04" ]]; then
             	echo "deb http://build.openvpn.net/debian/openvpn/stable xenial main" > /etc/apt/sources.list.d/openvpn.list
 				wget -O - https://swupdate.openvpn.net/repos/repo-public.gpg | apt-key add -
-				apt-get update
+				apt-get update > /dev/null 2>&1
         fi
-        # Ubuntu > 16.04 and Debian > 8 have OpenVPN >= 2.4 without the need of a third party repository.
-        sudo apt-get update /f >nul 2>&1
-        sudo apt-get install -y openvpn="${target_version}"* openssl /f >nul 2>&1
+        # Ubuntu >16.04 and Debian > 8 have OpenVPN >= 2.4 without the need of a third party repository.
+        info "Updating repositories ..."
+        sudo apt-get update > /dev/null 2>&1
+        info "Installing OpenVPN  ${target_version} ..."
+        sudo apt-get --reinstall --allow-downgrades install -y openvpn="${target_version}"* openssl
+        info "Installation of OpenVPN  ${target_version} is terminated successfully."
 
     elif [ "$os" == "centos" ]; then
-        sudo yum install -y "${target_version}"* openssl /f >nul 2>&1
+        info "Installing OpenVPN  ${target_version} ..."
+        sudo yum install -y "${target_version}"* openssl > /dev/null 2>&1
+        info "Installation of OpenVPN  ${target_version} is terminated successfully."
 
     elif [ "$os" == "fedora" ]; then
-        sudo dnf install openvpn-"${$target_version}"* /f >nul 2>&1
+        info "Installing OpenVPN  ${target_version} ..."
+        sudo dnf install openvpn-"${target_version}"* > /dev/null 2>&1
+        info "Installation of OpenVPN  ${target_version} is terminated successfully."
 
     else
         info "Unsupported version"
-
     fi
-
 else
     info "OpenVPN version ${target_version} is already installed."
 fi
