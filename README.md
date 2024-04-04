@@ -14,3 +14,7 @@ A given version can be passed as commandline param:
 sudo ./install_openvpn_linux.sh 2.4.7
 ```
 ### MacOS
+To run the script on Mac OS:
+```bash
+sudo ./install_openvpn_linux.sh
+```
