@@ -5,11 +5,11 @@
 powershell ./install_openvpn_win.ps1
 ```
 ### Linux
+To run the script on Linux platforms:
 ```bash
 sudo ./install_openvpn_linux.sh
 ```
 A given version can be passed as commandline param:
-### Linux
 ```bash
 sudo ./install_openvpn_linux.sh 2.4.7
 ```
